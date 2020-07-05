@@ -8,6 +8,7 @@ import (
 	"github.com/galdor/go-cmdline"
 
 	// Local
+	"github.com/alvesgabriel/cookiecutter/lint"
 	"github.com/alvesgabriel/cookiecutter/packages"
 	"github.com/alvesgabriel/cookiecutter/repository"
 	"github.com/alvesgabriel/cookiecutter/utils"
@@ -49,6 +50,8 @@ func main() {
 
 	createDir(directory)
 	packages.CreateVenv(managerPackage)
+	lint.CreateFile(directory)
+	lint.GitHook(directory)
 }
 
 func createDir(directory string) {

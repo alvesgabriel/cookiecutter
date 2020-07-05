@@ -9,7 +9,7 @@ type Package interface {
 
 var (
 	libs    = []string{"requests"}
-	libsDev = []string{"flake8"}
+	libsDev = []string{"flake8", "black"}
 )
 
 // CreateVenv creates virtualenv

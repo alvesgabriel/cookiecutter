@@ -32,13 +32,8 @@ func (p Pip) Create() {
 }
 
 func (p *Pip) installLibs(libs []string) []string {
-	activate := path.Join(p.EnvDir, ".venv", "bin", "activate")
-	log.Printf("ACTIVATE: %#v", activate)
-	source := fmt.Sprintf("source %s && %s install %s && deactivate", activate, p.Name, strings.Join(libs, " "))
-	log.Printf("SOURCE: %#v", source)
-	cmd := exec.Command("bash", "-c", source)
-	output, err := cmd.Output()
-	utils.FatalError(err)
+	command := p.Name + " install " + strings.Join(libs, " ")
+	output := RunVenvCommand(command, p.EnvDir)
 
 	return getLibsVersions(output)
 }
@@ -96,4 +91,17 @@ func pinLibVersion(lib string) string {
 	log.Printf("LIB: %#v", lib)
 	index := strings.LastIndexByte(lib, '-')
 	return lib[:index] + "==" + lib[index+1:]
+}
+
+// RunVenvCommand activate venv, run command and deactivate returning the output
+func RunVenvCommand(command, directory string) []byte {
+	activate := path.Join(directory, ".venv", "bin", "activate")
+	source := fmt.Sprintf("source " + activate + " && " + command + " && deactivate")
+	cmd := exec.Command("bash", "-c", source)
+	log.Printf("BASH COMMAND: %s", cmd.String())
+
+	output, err := cmd.Output()
+	utils.FatalError(err)
+
+	return output
 }
