@@ -8,6 +8,7 @@ import (
 	"github.com/galdor/go-cmdline"
 
 	// Local
+	"github.com/alvesgabriel/cookiecutter/ci"
 	"github.com/alvesgabriel/cookiecutter/lint"
 	"github.com/alvesgabriel/cookiecutter/packages"
 	"github.com/alvesgabriel/cookiecutter/repository"
@@ -24,14 +25,18 @@ func main() {
 	pathDir, err := os.Getwd()
 	utils.FatalError(err)
 
+	// Default options CLI
 	directory = pathDir
 	pack = "pip"
+	ciService := "travis"
 
 	cmd := cmdline.New()
 	cmd.AddOption("d", "directory", "dir", "Project directory")
 	cmd.SetOptionDefault("d", "current directory")
-	cmd.AddOption("p", "manager_packages", "pack", "Manager package to install dependences")
+	cmd.AddOption("p", "manager-packages", "pack", "Manager package to install dependences")
 	cmd.SetOptionDefault("p", pack)
+	cmd.AddOption("c", "continuous-integration", "continuous integration", "Continuous integration service")
+	cmd.SetOptionDefault("c", ciService)
 
 	cmd.Parse(os.Args)
 
@@ -41,17 +46,21 @@ func main() {
 	if cmd.IsOptionSet("p") {
 		pack = cmd.OptionValue("p")
 	}
+	if cmd.IsOptionSet("c") {
+		ciService = cmd.OptionValue("c")
+	}
 
 	var packs = map[string]packages.Package{
-		"pip": packages.Pip{Name: "pip", EnvDir: directory},
+		"pip": packages.NewPip(directory),
 	}
 
 	managerPackage = packs[pack]
 
 	createDir(directory)
 	packages.CreateVenv(managerPackage)
-	lint.CreateFile(directory)
+	lint.CreateFlake8(directory)
 	lint.GitHook(directory)
+	ci.CreateTravis(managerPackage)
 }
 
 func createDir(directory string) {

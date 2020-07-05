@@ -2,29 +2,28 @@ package lint
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
 
 	// Local
 	"github.com/alvesgabriel/cookiecutter/packages"
-	"github.com/alvesgabriel/cookiecutter/utils"
 )
 
-// CreateFile create file '.flake8'
-func CreateFile(directory string) {
-	flake8Content := `[flake8]
-	max-line-length=120
-	exclude=.venv`
+const (
+	flake8Content = `[flake8]
+max-line-length=120
+exclude=.venv`
+)
+
+// CreateFlake8 create file '.flake8'
+func CreateFlake8(directory string) {
 	flake8File := path.Join(directory, ".flake8")
 
 	if _, err := os.Stat(flake8File); os.IsNotExist(err) {
-		f, err := os.OpenFile(flake8File, os.O_CREATE, 0664)
-		utils.FatalError(err)
-		defer f.Close()
-
-		if _, err := f.Write([]byte(flake8Content)); err != nil {
-			log.Printf("CAN'T WRITE IN THE FILE %s", flake8File)
+		if err := ioutil.WriteFile(flake8File, []byte(flake8Content), 0664); err != nil {
+			log.Printf("CAN'T WRITE IN THE FILE %s: %s", flake8File, err.Error())
 		}
 	}
 }
