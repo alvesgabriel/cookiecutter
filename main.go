@@ -52,7 +52,7 @@ func main() {
 }
 
 func createDir(directory string) {
-	log.Printf("CREATING DIR: %s", directory)
+	log.Printf("CREATING DIR: %#v", directory)
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		os.Mkdir(directory, os.FileMode(0775))
 	}
