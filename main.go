@@ -42,7 +42,7 @@ func main() {
 	}
 
 	var packs = map[string]packages.Package{
-		"pip": packages.Pip{"pip", directory},
+		"pip": packages.Pip{Name: "pip", EnvDir: directory},
 	}
 
 	managerPackage = packs[pack]
@@ -52,8 +52,8 @@ func main() {
 }
 
 func createDir(directory string) {
-	log.Printf("CREATING DIR: %#v", directory)
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
+		log.Printf("CREATING DIR: %#v", directory)
 		os.Mkdir(directory, os.FileMode(0775))
 	}
 	repository.Init(directory)
